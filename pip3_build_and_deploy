@@ -3,29 +3,21 @@ use warnings;
 
 # We use this as a simple bool, to dictate whether we use the
 # pypi test url, or we are publishing live
-my $test;
-($test = "NULL") unless ($test = shift);
+my $repo_extra = " --verbose ";
+my $test = shift // "NULL";
 if ($test =~ m/test/i) {
 	print("Publishing to test environment\n");
-	$test = 1;
+	$repo_extra .= "--repository-url https://test.pypi.org/legacy/";
+	$base = "test.v5";
 } elsif ($test =~ m/prod/i) {
 	print("Publishing to prod environment\n");
-	$test = 0;
+	$base="v5"; # This is the base version, version5 in this case
 } else {
 	print("Usage: $0 test|prod\n");
 	exit(1);
 }
-my $repo_extra = " --verbose ";
-my $base;
 
 # Add the test repo url if we are in test mode
-if ($test == 1) {
-	$repo_extra = "--repository-url https://test.pypi.org/legacy/";
-	$base = "test.v5";
-}	else {
-	$base="v5"; # This is the base version, version5 in this case
-}
-
 my @tags = `git tag -l`;
 my $version = "$base.0";
 foreach (reverse(@tags)) {
@@ -51,14 +43,18 @@ if ($answer =~ '(y|Y)') {
 }
 sleep(1); # give user a moment to panic CTRL-C if needs be
 # Write version into file for setup.py
-die("Could not write version\n") unless (0 == system("echo $new_version > flac2all_pkg/version"));
+open(FD, ">flac2all_pkg/version");
+print FD $new_version;
+close(FD);
+
 # Create the git tag
-die("Could not create git tag\n") unless (0 == system("git tag -a '$new_version' -m \"Auto-Release Version $new_version\""));
+die("Could not create git tag\n") if system("git tag -a '$new_version' -m \"Auto-Release Version $new_version\"");
 # And we remove the build and dist folder, to make sure fresh files are used
 system("rm -rf ./build ./dist");
 # Now run the code to push to pip
-die("Could not build and deploy to pypi\n") unless (0 == system("python3 ./setup.py sdist bdist_wheel && twine upload $repo_extra dist/*"));
+die("Could not build\n") if system("python3", "./setup.py", "sdist", "bdist_wheel");
+die("Could not deploy to pypi\n") if system("twine upload -u __token__ $repo_extra dist/*");
 # Finally, we push the tag to git
-system("git push origin $new_version");
+die("git push failed\n") if system("git", "push", "origin", $new_version);
 
 print("Complete! To do a test upgrade, run \"pip install -U --index-url https://test.pypi.org/simple/ flac2all\"");
