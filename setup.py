@@ -3,9 +3,9 @@
 # vim: ts=4 expandtab ai
 #
 # File Created: Tue 10 Jan 00:31:22 GMT 2017
-# Copyright 2017
+# Copyright 2017 flac2all
 #
-# Licensced under the GPLv3
+# Licensed under the GPLv3
 #
 #  =============================================================|
 

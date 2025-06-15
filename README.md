@@ -1,4 +1,17 @@
 ## News / Changes
+### 15/06/2025 - v5.4 released.
+
+Its been a while since an official release, but work has been going on in the background. As is common with mature software, most of the changes have been incremental bugfixes and minor feature requests.
+
+Changes in this version:
+
+* Fixed issue #54
+* Added enhancement #56
+* Fixed issue #57
+* Fixed issue #59
+* Fixed issue #62
+* Fixed issue #67
+
 
 ### 05/01/2020 - v5.3 released
 

@@ -1,13 +1,16 @@
-#!/usr/bin/perl
-use warnings;
-
+#!/usr/bin/env perl
+use strict;
+my $python = "python3.11";
+# Requirements: wheel and twine
+die(usage()) unless ($ENV{TOKEN_pip});
+my @repo_extra = (" --verbose ");
 # We use this as a simple bool, to dictate whether we use the
 # pypi test url, or we are publishing live
-my $repo_extra = " --verbose ";
 my $test = shift // "NULL";
+my $base;
 if ($test =~ m/test/i) {
 	print("Publishing to test environment\n");
-	$repo_extra .= "--repository-url https://test.pypi.org/legacy/";
+	push(@repo_extra, "--repository-url", "https://test.pypi.org/legacy/");
 	$base = "test.v5";
 } elsif ($test =~ m/prod/i) {
 	print("Publishing to prod environment\n");
@@ -51,10 +54,22 @@ close(FD);
 die("Could not create git tag\n") if system("git tag -a '$new_version' -m \"Auto-Release Version $new_version\"");
 # And we remove the build and dist folder, to make sure fresh files are used
 system("rm -rf ./build ./dist");
-# Now run the code to push to pip
-die("Could not build\n") if system("python3", "./setup.py", "sdist", "bdist_wheel");
-die("Could not deploy to pypi\n") if system("twine upload -u __token__ $repo_extra dist/*");
+# Now run the code to push to pip, you need to "pip install wheel" for bdist_wheel.
+die("Could not build\n") if system($python, "./setup.py", "sdist", "bdist_wheel");
+die("Could not deploy to pypi\n") if system( join(' ',
+	"twine", "upload",
+	"-u", "__token__",
+	"-p", $ENV{TOKEN_pip},
+	@repo_extra,
+	glob("dist/*")
+));
+die();
 # Finally, we push the tag to git
 die("git push failed\n") if system("git", "push", "origin", $new_version);
 
 print("Complete! To do a test upgrade, run \"pip install -U --index-url https://test.pypi.org/simple/ flac2all\"");
+
+
+sub usage() {
+	die("Usage: $0 (test|prod).\n\tN.B: Please set TOKEN_pip to your PyPi token for upload prior to running.\n");
+}
