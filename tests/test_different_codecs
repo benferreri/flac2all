@@ -1,0 +1,21 @@
+#!/usr/bin/env perl
+use lib '.';
+require "core.pm";
+
+my @tests = (
+	"-h",
+	"mp3,vorbis,test,f:alac",
+	" mp3,vorbis,test,f:alac -c",
+	"mp3,vorbis,test,f:alac -n d",
+	"mp3,vorbis,test,f:alac -n m",
+	"all -m"
+);
+
+foreach(@tests) {
+	print '-'x80;
+	my $cmd = "$python ../flac2all_pkg/__init__.py $_ -o ./testoutput ./testinput";
+	die(">>>> Test failed! $!\n>>>> Command: $cmd\n") if system($cmd);
+	print (">>>> Test OK!\n");
+}
+
+

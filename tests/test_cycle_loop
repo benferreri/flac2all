@@ -2,21 +2,25 @@
 # This test runs flac2all in a loop, in order to check if there are
 # any bugs with launching/terminating workers (symptoms include
 # hanging runs, or unexpected termination)
-chdir("./flac2all_pkg");
+use lib '.';
+require 'core.pm';
+
 $run=0;
 while($run != 22000) {
+	print '-'x80;
 	print "Run $run\n";
 	# Every 250 runs, delete the testout to reconvert
 	system("rm","-rf","../testoutput") if (($run % 250) == 0);
-	die("Failed on run $run\n") if system(
+	die(">>>> Failed on run $run\n") if system(
 		"python3",
-		"./__init__.py",
+		"../flac2all_pkg/__init__.py",
 		"vorbis",
 		"-c",
 		"-n", "m",
-		"-o", "../testoutput/",
-		"../testinput/"
+		"-o", "./testoutput/",
+		"./testinput/"
 	);
+	print (">>>> Test OK!\n");
 	# To prevent race conditions when we launch too fast (in the real
 	# world, nobody will restart flac2all in such a tight loop).
 	sleep(1);
