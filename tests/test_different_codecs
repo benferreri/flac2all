@@ -5,14 +5,26 @@ require "core.pm";
 my @tests = (
 	"-h",
 	"mp3,vorbis,test,f:alac",
-	" mp3,vorbis,test,f:alac -c",
+	"mp3,vorbis,test,f:alac -C -f",
+	"mp3,vorbis,test,f:alac -c",
 	"mp3,vorbis,test,f:alac -n d",
 	"mp3,vorbis,test,f:alac -n m",
-	"all -m"
+	"all -C -f",
+	"all -m",
 );
 
 foreach(@tests) {
 	print '-'x80;
+	if ($_ =~ m/-m/) {
+		# In master mode we need to fork a worker for testing
+		# keeping it local
+		my $pid = fork();
+		sleep 2; # For rest of program to spawn master flac2all
+		if ($pid) {
+			exec("$python ../flac2all_pkg/flac2all_worker.py localhost");
+		}
+	}
+
 	my $cmd = "$python ../flac2all_pkg/__init__.py $_ -o ./testoutput ./testinput";
 	die(">>>> Test failed! $!\n>>>> Command: $cmd\n") if system($cmd);
 	print (">>>> Test OK!\n");
