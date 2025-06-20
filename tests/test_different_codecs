@@ -9,8 +9,8 @@ my @tests = (
 	"mp3,vorbis,test,f:alac -c",
 	"mp3,vorbis,test,f:alac -n d",
 	"mp3,vorbis,test,f:alac -n m",
-	"all -C -f",
-	"all -m",
+	"mp3,vorbis,test,f:alac -C -f",
+	"mp3,vorbis,test,f:alac -m -f"
 );
 
 foreach(@tests) {
