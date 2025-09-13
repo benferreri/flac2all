@@ -1,5 +1,5 @@
 ## News / Changes
-### 15/06/2025 - v5.4 released.
+### 13/09/2025 - v5.4 released.
 
 Its been a while since an official release, but work has been going on in the background. As is common with mature software, most of the changes have been incremental bugfixes and minor feature requests.
 
@@ -12,6 +12,7 @@ Changes in this version:
 * Fixed issue #62
 * Fixed issue #67
 
+In addition I've got my PyPi account working again, so was able to push version 5.4 to pip. Therefore you should be able to do a pip upgrade to the latest version.
 
 ### 05/01/2020 - v5.3 released
 
